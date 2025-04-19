@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicase: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: gost-on/latest:latest
+        envFrom:
+        - secretRef:
+            name: app-secrets
+        - configMapRef:
+            name: app-config
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "75mi"
+            cpu: "300m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+      volumes:
+      - name: app-code
+        emptyDir: {}
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: gost-on
+spec:
+  type: ClusterIP
+  selector:
+    app: app
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
