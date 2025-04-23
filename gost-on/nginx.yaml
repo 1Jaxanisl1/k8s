@@ -30,13 +30,13 @@ spec:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
-        - name: static-files
+        - name: shared-static
           mountPath: /app/static
       volumes:
       - name: nginx-config
         configMap:
           name: nginx-config
-      - name: static-files
+      - name: shared-static
         emptyDir: {}
 
 
@@ -52,9 +52,11 @@ spec:
   selector:
     app: nginx
   ports:
-  - protocol: TCP
+  - name: transport
+    protocol: TCP
     port: 80
     targetPort: 80
-  - protocol: TCP
+  - name: encrypt
+    protocol: TCP
     port: 443
     targetPort: 443
